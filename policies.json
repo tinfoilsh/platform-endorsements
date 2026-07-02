@@ -1,0 +1,127 @@
+{
+  "amd-genoa-prod": {
+    "platform": "sev-snp",
+    "sev_snp": {
+      "minimum_build": 21,
+      "minimum_api_version": "1.55",
+      "minimum_guest_svn": 0,
+      "minimum_tcb": { "bl_spl": 7, "tee_spl": 0, "snp_spl": 14, "ucode_spl": 72 },
+      "minimum_launch_tcb": { "bl_spl": 7, "tee_spl": 0, "snp_spl": 14, "ucode_spl": 72 },
+      "guest_policy": { "debug": false, "smt": true, "migrate_ma": false, "single_socket": false },
+      "platform_info": {
+        "smt_enabled": true,
+        "tsme_enabled": true,
+        "ecc_enabled": false,
+        "rapl_disabled": false,
+        "ciphertext_hiding_dram": false
+      },
+      "permit_provisional_firmware": false,
+      "vmpl": null
+    }
+  },
+  "amd-turin-prod": {
+    "platform": "sev-snp",
+    "sev_snp": {
+      "minimum_build": 0,
+      "minimum_api_version": "1.58",
+      "minimum_guest_svn": 0,
+      "minimum_tcb": { "fmc_spl": 1, "bl_spl": 1, "tee_spl": 1, "snp_spl": 4, "ucode_spl": 82 },
+      "minimum_launch_tcb": { "fmc_spl": 1, "bl_spl": 1, "tee_spl": 1, "snp_spl": 4, "ucode_spl": 82 },
+      "guest_policy": { "debug": false, "smt": true, "migrate_ma": false, "single_socket": false },
+      "platform_info": {
+        "smt_enabled": true,
+        "tsme_enabled": true,
+        "ecc_enabled": false,
+        "rapl_disabled": false,
+        "ciphertext_hiding_dram": false
+      },
+      "permit_provisional_firmware": false,
+      "vmpl": null
+    }
+  },
+  "tdx-h200-prod": {
+    "platform": "tdx",
+    "tdx": {
+      "qe_vendor_id": "939a7233f79c4ca9940a0db3957f0607",
+      "minimum_qe_svn": 0,
+      "minimum_pce_svn": 0,
+      "minimum_tee_tcb_svn": "03010200000000000000000000000000",
+      "accepted_mr_seams": [
+        "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c",
+        "7bf063280e94fb051f5dd7b1fc59ce9aac42bb961df8d44b709c9b0ff87a7b4df648657ba6d1189589feab1d5a3c9a9d",
+        "685f891ea5c20e8fa27b151bf34bf3b50fbaf7143cc53662727cbdb167c0ad8385f1f6f3571539a91e104a1c96d75e04",
+        "49b66faa451d19ebbdbe89371b8daf2b65aa3984ec90110343e9e2eec116af08850fa20e3b1aa9a874d77a65380ee7e6"
+      ],
+      "td_attributes": "0000001000000000",
+      "xfam": "e702060000000000",
+      "mr_config_id_zero": true,
+      "mr_owner_zero": true,
+      "mr_owner_config_zero": true,
+      "minimum_tcb_evaluation_data_number": 19,
+      "platform_measurements": [
+        "mini_0d",
+        "small_0d",
+        "small_0d_new",
+        "medium_0d",
+        "medium_0d_new",
+        "medium_1d",
+        "medium_1d_new",
+        "medium_2d_new",
+        "medium_4d_new",
+        "large_1d_new",
+        "extra_large_1d_new",
+        "extra_large_2d_new"
+      ]
+    }
+  },
+  "tdx-b200-prod": {
+    "platform": "tdx",
+    "tdx": {
+      "qe_vendor_id": "939a7233f79c4ca9940a0db3957f0607",
+      "minimum_qe_svn": 0,
+      "minimum_pce_svn": 0,
+      "minimum_tee_tcb_svn": "03010200000000000000000000000000",
+      "accepted_mr_seams": [
+        "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c",
+        "7bf063280e94fb051f5dd7b1fc59ce9aac42bb961df8d44b709c9b0ff87a7b4df648657ba6d1189589feab1d5a3c9a9d",
+        "685f891ea5c20e8fa27b151bf34bf3b50fbaf7143cc53662727cbdb167c0ad8385f1f6f3571539a91e104a1c96d75e04",
+        "49b66faa451d19ebbdbe89371b8daf2b65aa3984ec90110343e9e2eec116af08850fa20e3b1aa9a874d77a65380ee7e6"
+      ],
+      "td_attributes": "0000001000000000",
+      "xfam": "e702060000000000",
+      "mr_config_id_zero": true,
+      "mr_owner_zero": true,
+      "mr_owner_config_zero": true,
+      "minimum_tcb_evaluation_data_number": 19,
+      "platform_measurements": [
+        "extra_large_1d_b200_new",
+        "extra_large_2d_b200_new"
+      ]
+    }
+  },
+  "tdx-b300-prod": {
+    "platform": "tdx",
+    "tdx": {
+      "qe_vendor_id": "939a7233f79c4ca9940a0db3957f0607",
+      "minimum_qe_svn": 0,
+      "minimum_pce_svn": 0,
+      "minimum_tee_tcb_svn": "03010200000000000000000000000000",
+      "accepted_mr_seams": [
+        "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c",
+        "7bf063280e94fb051f5dd7b1fc59ce9aac42bb961df8d44b709c9b0ff87a7b4df648657ba6d1189589feab1d5a3c9a9d",
+        "685f891ea5c20e8fa27b151bf34bf3b50fbaf7143cc53662727cbdb167c0ad8385f1f6f3571539a91e104a1c96d75e04",
+        "49b66faa451d19ebbdbe89371b8daf2b65aa3984ec90110343e9e2eec116af08850fa20e3b1aa9a874d77a65380ee7e6"
+      ],
+      "td_attributes": "0000001000000000",
+      "xfam": "e702060000000000",
+      "mr_config_id_zero": true,
+      "mr_owner_zero": true,
+      "mr_owner_config_zero": true,
+      "minimum_tcb_evaluation_data_number": 19,
+      "platform_measurements": [
+        "extra_large_1d_b300_new",
+        "extra_large_2d_b300_new"
+      ]
+    }
+  }
+}

@@ -17,11 +17,15 @@ jobs:
     steps:
     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
 
-    - run: ./fetch-tdx-measure.sh
+    - name: Validate machines and policies
+      run: python3 scripts/validate.py
+
+    - run: ./scripts/fetch-tdx-measure.sh
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: ./fetch-ovmf.sh
-    - run: ./measure.sh
+    - run: ./scripts/fetch-ovmf.sh
+    - run: ./scripts/measure.sh
+    - run: ./scripts/build-endorsements.sh
 
     - name: Hash platform measurements
       shell: bash
@@ -29,6 +33,14 @@ jobs:
       run: |
         echo stdout=sha256:$(sudo sha256sum hardware-measurements.json | cut -d ' ' -f 1 | sudo tee tinfoil.hash) >> $GITHUB_OUTPUT
 
+    - name: Hash platform endorsements
+      shell: bash
+      id: hashendorsements
+      run: |
+        echo stdout=sha256:$(sudo sha256sum platform-endorsements.json | cut -d ' ' -f 1 | sudo tee platform-endorsements.hash) >> $GITHUB_OUTPUT
+
+    # Legacy verifiers resolve releases/latest and read tinfoil.hash; the
+    # legacy asset set MUST remain in every release until formally retired.
     - name: Attest
       uses: actions/attest@67422f5511b7ff725f4dbd6fb9bd2cd925c65a8d  # v1.4.1
       id: attest
@@ -38,9 +50,20 @@ jobs:
         predicate-type: https://tinfoil.sh/predicate/hardware-measurements/v1
         predicate-path: hardware-measurements.json
 
+    - name: Attest platform endorsements
+      uses: actions/attest@67422f5511b7ff725f4dbd6fb9bd2cd925c65a8d  # v1.4.1
+      id: attestendorsements
+      with:
+        subject-name: platform-endorsements.json
+        subject-digest: ${{ steps.hashendorsements.outputs.stdout }}
+        predicate-type: https://tinfoil.sh/predicate/platform-endorsements/v1
+        predicate-path: platform-endorsements.json
+
     - name: Create release
       uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2.6.2
       with:
         files: |
           hardware-measurements.json
           tinfoil.hash
+          platform-endorsements.json
+          platform-endorsements.hash
