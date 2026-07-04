@@ -27,35 +27,18 @@ jobs:
     - run: ./scripts/measure.sh
     - run: ./scripts/build-endorsements.sh
 
-    - name: Hash platform measurements
+    - name: Hash platform endorsements
       shell: bash
       id: hash
       run: |
-        echo stdout=sha256:$(sudo sha256sum hardware-measurements.json | cut -d ' ' -f 1 | sudo tee tinfoil.hash) >> $GITHUB_OUTPUT
-
-    - name: Hash platform endorsements
-      shell: bash
-      id: hashendorsements
-      run: |
         echo stdout=sha256:$(sudo sha256sum platform-endorsements.json | cut -d ' ' -f 1 | sudo tee platform-endorsements.hash) >> $GITHUB_OUTPUT
-
-    # Legacy verifiers resolve releases/latest and read tinfoil.hash; the
-    # legacy asset set MUST remain in every release until formally retired.
-    - name: Attest
-      uses: actions/attest@67422f5511b7ff725f4dbd6fb9bd2cd925c65a8d  # v1.4.1
-      id: attest
-      with:
-        subject-name: hardware-measurements.json
-        subject-digest: ${{ steps.hash.outputs.stdout }}
-        predicate-type: https://tinfoil.sh/predicate/hardware-measurements/v1
-        predicate-path: hardware-measurements.json
 
     - name: Attest platform endorsements
       uses: actions/attest@67422f5511b7ff725f4dbd6fb9bd2cd925c65a8d  # v1.4.1
-      id: attestendorsements
+      id: attest
       with:
         subject-name: platform-endorsements.json
-        subject-digest: ${{ steps.hashendorsements.outputs.stdout }}
+        subject-digest: ${{ steps.hash.outputs.stdout }}
         predicate-type: https://tinfoil.sh/predicate/platform-endorsements/v1
         predicate-path: platform-endorsements.json
 
@@ -63,7 +46,21 @@ jobs:
       uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2.6.2
       with:
         files: |
-          hardware-measurements.json
-          tinfoil.hash
           platform-endorsements.json
           platform-endorsements.hash
+
+    # Ask the legacy hardware-measurements repo to republish its v1 artifact
+    # (the .measurements section of this release) under its own signing
+    # identity, so legacy verifiers stay in sync during their support window.
+    # Requires a REPUBLISH_PAT secret with repo scope on the legacy repo;
+    # skipped when the secret is not configured (manual republish instead).
+    - name: Trigger legacy v1 republish
+      env:
+        REPUBLISH_PAT: ${{ secrets.REPUBLISH_PAT }}
+      if: ${{ env.REPUBLISH_PAT != '' }}
+      run: |
+        curl -sS -X POST \
+          -H "Authorization: token ${REPUBLISH_PAT}" \
+          -H "Accept: application/vnd.github+json" \
+          https://api.github.com/repos/tinfoilsh/hardware-measurements/dispatches \
+          -d "{\"event_type\": \"republish\", \"client_payload\": {\"tag\": \"${GITHUB_REF_NAME}\"}}"

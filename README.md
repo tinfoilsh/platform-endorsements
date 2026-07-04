@@ -1,14 +1,20 @@
-# Tinfoil Hardware Measurements
+# Tinfoil Platform Endorsements
 
-This repository contains the platform configurations and machine endorsements
-trusted by Tinfoil clients when verifying remote attestation reports. It
-publishes two Sigstore-attested artifacts per release:
+This repository is the source of truth for the platform configurations and
+machine endorsements trusted by Tinfoil clients when verifying remote
+attestation reports. Each release publishes a Sigstore-attested artifact:
 
-- `platform-endorsements.json` — the platform measurements plus the endorsed
-  machine identities (`machines.json`) and their validation policies
+- `platform-endorsements.json` — TDX platform measurements, the endorsed
+  machine identities (`machines.json`), and their validation policies
   (`policies.json`)
-- `hardware-measurements.json` (legacy) — TDX platform measurements
-  (`MRTD`/`RTMR0`) per platform configuration, kept for existing verifiers
+
+Predicate: `https://tinfoil.sh/predicate/platform-endorsements/v1`
+
+Legacy note: the [`hardware-measurements`](https://github.com/tinfoilsh/hardware-measurements)
+repository republishes the `measurements` section of each release as the
+legacy `hardware-measurements.json` artifact under its own signing identity,
+for verifiers that predate this repository. It is on a deprecation path and
+will be archived when legacy client support ends.
 
 ## Structure
 
@@ -46,6 +52,8 @@ publishes two Sigstore-attested artifacts per release:
 - **Add or replace a machine**: add/change one line in `machines.json`
   (identifier -> policy name), open a PR. CI validates formats and policy
   references.
+- **Remove a machine**: machines that leave the fleet (decommissioned,
+  lease returned, CPU replaced) MUST be removed from `machines.json`.
 - **Change a policy**: edit `policies.json`, open a PR. All machines
   referencing the policy move atomically with the release.
 - **Add a platform configuration**: add `platforms/<name>/` with
@@ -59,7 +67,7 @@ publishes two Sigstore-attested artifacts per release:
    ./scripts/fetch-ovmf.sh
    ```
 
-2. Generate measurements and the v2 artifact:
+2. Generate measurements and the endorsements artifact:
    ```bash
    ./scripts/measure.sh
    ./scripts/build-endorsements.sh
@@ -76,14 +84,12 @@ Each platform directory contains:
 On each tag push, the release workflow:
 1. Validates `machines.json` and `policies.json`
 2. Downloads the required tools (`tdx-measure` and `OVMF`)
-3. Generates hardware measurements for all platforms and assembles the v2
-   artifact
-4. Creates Sigstore attestations for both `hardware-measurements.json`
-   (predicate `https://tinfoil.sh/predicate/hardware-measurements/v1`) and
-   `platform-endorsements.json` (predicate
+3. Generates hardware measurements for all platforms and assembles
+   `platform-endorsements.json`
+4. Creates a Sigstore attestation for the artifact (predicate
    `https://tinfoil.sh/predicate/platform-endorsements/v1`)
-5. Publishes all artifacts and hash files as release assets
+5. Publishes the artifact and its hash file as release assets
+6. Notifies the legacy repository to republish the v1 measurements artifact
 
-Both attestations are published to Sigstore's transparency log, ensuring the
-integrity and provenance of the measurements and endorsements. Every release
-includes the v1 assets for compatibility with existing verifiers.
+The attestation is published to Sigstore's transparency log, ensuring the
+integrity and provenance of the measurements and endorsements.
