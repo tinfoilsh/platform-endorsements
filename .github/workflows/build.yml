@@ -1,14 +1,21 @@
 name: Build
 
+# Phase 2 — attest and publish a release. Runs on tag pushes, or dispatched
+# against a tag ref by release.yml. Must only ever run on a tag ref: the
+# Sigstore identity embedded in the attestation reflects the ref, and
+# verifiers pin `@refs/tags/*` — an attestation minted from a branch ref
+# would not verify.
+
+run-name: Publish release ${{ github.ref_name }}
+
 on:
   push:
     tags:
       - 'v*'
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Release tag (e.g. v0.1.0). Reuses the tag's commit if it exists, otherwise tags the current branch head."
-        required: true
+
+concurrency:
+  group: platform-endorsements-release-${{ github.ref_name }}
 
 permissions:
   id-token: write
@@ -20,25 +27,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
-      with:
-        fetch-depth: 0  # tags needed for manual re-releases
-
-    - name: Resolve release tag
-      id: tag
-      env:
-        EVENT_NAME: ${{ github.event_name }}
-        INPUT_TAG: ${{ github.event.inputs.tag }}
+    - name: Require a tag ref
+      if: ${{ github.ref_type != 'tag' }}
       run: |
-        if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-          TAG="$INPUT_TAG"
-          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-            git checkout "refs/tags/$TAG"
-          fi
-        else
-          TAG="$GITHUB_REF_NAME"
-        fi
-        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+        echo "::error::This workflow must run on a tag ref (got ${{ github.ref }}). Use the Release workflow to create one."
+        exit 1
+
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
 
     - name: Validate machines and policies
       run: python3 scripts/validate.py
@@ -68,7 +63,7 @@ jobs:
     - name: Create release
       uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2.6.2
       with:
-        tag_name: ${{ steps.tag.outputs.tag }}
+        tag_name: ${{ github.ref_name }}
         files: |
           platform-endorsements.json
           platform-endorsements.hash
@@ -87,4 +82,4 @@ jobs:
           -H "Authorization: token ${REPUBLISH_PAT}" \
           -H "Accept: application/vnd.github+json" \
           https://api.github.com/repos/tinfoilsh/hardware-measurements/dispatches \
-          -d "{\"event_type\": \"republish\", \"client_payload\": {\"tag\": \"${{ steps.tag.outputs.tag }}\"}}"
+          -d "{\"event_type\": \"republish\", \"client_payload\": {\"tag\": \"${GITHUB_REF_NAME}\"}}"
