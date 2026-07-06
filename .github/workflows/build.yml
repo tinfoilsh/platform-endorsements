@@ -50,9 +50,6 @@ jobs:
     - run: ./scripts/measure.sh
     - run: ./scripts/build-endorsements.sh
 
-    # tinfoil.hash is the standard digest-asset name across tinfoil release
-    # repos; it holds sha256(platform-endorsements.json) and is what the SDK
-    # and github proxy expect.
     - name: Hash platform endorsements
       shell: bash
       id: hash
