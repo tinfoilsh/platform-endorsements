@@ -3,7 +3,6 @@ measurements/
 hardware-measurements.json
 platform-endorsements.json
 tinfoil.hash
-platform-endorsements.hash
 transcripts/
 OVMF.fd
 __pycache__

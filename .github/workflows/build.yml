@@ -50,11 +50,14 @@ jobs:
     - run: ./scripts/measure.sh
     - run: ./scripts/build-endorsements.sh
 
+    # tinfoil.hash is the standard digest-asset name across tinfoil release
+    # repos; it holds sha256(platform-endorsements.json) and is what the SDK
+    # and github proxy expect.
     - name: Hash platform endorsements
       shell: bash
       id: hash
       run: |
-        echo stdout=sha256:$(sudo sha256sum platform-endorsements.json | cut -d ' ' -f 1 | sudo tee platform-endorsements.hash) >> $GITHUB_OUTPUT
+        echo stdout=sha256:$(sudo sha256sum platform-endorsements.json | cut -d ' ' -f 1 | sudo tee tinfoil.hash) >> $GITHUB_OUTPUT
 
     - name: Attest platform endorsements
       uses: actions/attest@67422f5511b7ff725f4dbd6fb9bd2cd925c65a8d  # v1.4.1
@@ -71,7 +74,7 @@ jobs:
         tag_name: ${{ steps.tag.outputs.tag }}
         files: |
           platform-endorsements.json
-          platform-endorsements.hash
+          tinfoil.hash
 
     # Ask the legacy hardware-measurements repo to republish its v1 artifact
     # (the .measurements section of this release) under its own signing
