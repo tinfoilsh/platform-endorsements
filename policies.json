@@ -26,9 +26,10 @@
       "platform_info": {
         "smt_enabled": true,
         "tsme_enabled": true,
-        "ecc_enabled": false,
+        "ecc_enabled": true,
         "rapl_disabled": false,
-        "ciphertext_hiding_dram": false
+        "ciphertext_hiding_dram": false,
+        "alias_check_complete": true
       },
       "permit_provisional_firmware": false,
       "vmpl": null

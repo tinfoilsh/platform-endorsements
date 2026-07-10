@@ -46,6 +46,7 @@ PLATFORM_INFO_FIELDS = {
     "smt_enabled", "tsme_enabled", "ecc_enabled", "rapl_disabled",
     "ciphertext_hiding_dram",
 }
+PLATFORM_INFO_OPTIONAL_FIELDS = {"alias_check_complete", "tio_enabled"}
 TDX_FIELDS = {
     "qe_vendor_id", "minimum_qe_svn", "minimum_pce_svn",
     "minimum_tee_tcb_svn", "mr_seam", "td_attributes", "xfam",
@@ -100,8 +101,10 @@ def validate_sev_policy(name: str, block: dict) -> None:
     if not (GUEST_POLICY_FIELDS <= gp <= GUEST_POLICY_FIELDS | GUEST_POLICY_OPTIONAL_FIELDS):
         err(f"policy {name}: guest_policy must have {sorted(GUEST_POLICY_FIELDS)} "
             f"(optionally {sorted(GUEST_POLICY_OPTIONAL_FIELDS)})")
-    if set(block.get("platform_info", {})) != PLATFORM_INFO_FIELDS:
-        err(f"policy {name}: platform_info must have exactly {sorted(PLATFORM_INFO_FIELDS)}")
+    pi = set(block.get("platform_info", {}))
+    if not (PLATFORM_INFO_FIELDS <= pi <= PLATFORM_INFO_FIELDS | PLATFORM_INFO_OPTIONAL_FIELDS):
+        err(f"policy {name}: platform_info must have {sorted(PLATFORM_INFO_FIELDS)} "
+            f"(optionally {sorted(PLATFORM_INFO_OPTIONAL_FIELDS)})")
     if not re.match(r"^\d+\.\d+$", block.get("minimum_api_version", "")):
         err(f"policy {name}: minimum_api_version must be 'maj.min'")
 
