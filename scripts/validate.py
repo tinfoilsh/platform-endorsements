@@ -53,7 +53,8 @@ TDX_FIELDS = {
     "mr_config_id_zero", "mr_owner_zero", "mr_owner_config_zero",
     "minimum_tcb_evaluation_data_number", "platform_measurements",
 }
-SHAPE_FIELDS = {"cpus", "memory_mb", "gpus", "disks"}
+SHAPE_FIELDS = {"cpus", "memory_mb", "disks"}
+SHAPE_OPTIONAL_FIELDS = {"gpus"}
 
 errors: list[str] = []
 
@@ -130,8 +131,9 @@ def validate_shape(slug: str, path: Path) -> None:
     shape = load(path)
     if shape is None:
         return
-    if set(shape) != SHAPE_FIELDS:
-        err(f"platform {slug}: shape.json must have exactly {sorted(SHAPE_FIELDS)}")
+    if not (SHAPE_FIELDS <= set(shape) <= SHAPE_FIELDS | SHAPE_OPTIONAL_FIELDS):
+        err(f"platform {slug}: shape.json must have {sorted(SHAPE_FIELDS)} "
+            f"(optionally {sorted(SHAPE_OPTIONAL_FIELDS)})")
         return
     for k, v in shape.items():
         if not isinstance(v, int) or v < 0:

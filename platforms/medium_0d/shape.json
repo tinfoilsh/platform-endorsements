@@ -1,6 +1,5 @@
 {
   "cpus": 16,
   "memory_mb": 65536,
-  "gpus": 0,
-  "disks": 4
+  "disks": 3
 }
