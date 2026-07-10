@@ -78,9 +78,6 @@
       "minimum_qe_svn": 0,
       "minimum_pce_svn": 0,
       "minimum_tee_tcb_svn": "03010200000000000000000000000000",
-      "accepted_mr_seams": [
-        "7bf063280e94fb051f5dd7b1fc59ce9aac42bb961df8d44b709c9b0ff87a7b4df648657ba6d1189589feab1d5a3c9a9d"
-      ],
       "td_attributes": "0000001000000000",
       "xfam": "e702060000000000",
       "mr_config_id_zero": true,
@@ -100,7 +97,8 @@
         "large_1d_new",
         "extra_large_1d_new",
         "extra_large_2d_new"
-      ]
+      ],
+      "mr_seam": "7bf063280e94fb051f5dd7b1fc59ce9aac42bb961df8d44b709c9b0ff87a7b4df648657ba6d1189589feab1d5a3c9a9d"
     }
   },
   "tdx-b200-prod": {
@@ -110,9 +108,6 @@
       "minimum_qe_svn": 0,
       "minimum_pce_svn": 0,
       "minimum_tee_tcb_svn": "03010200000000000000000000000000",
-      "accepted_mr_seams": [
-        "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c"
-      ],
       "td_attributes": "0000001000000000",
       "xfam": "e702060000000000",
       "mr_config_id_zero": true,
@@ -122,7 +117,8 @@
       "platform_measurements": [
         "extra_large_1d_b200_new",
         "extra_large_2d_b200_new"
-      ]
+      ],
+      "mr_seam": "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c"
     }
   },
   "tdx-b300-prod": {
@@ -132,9 +128,6 @@
       "minimum_qe_svn": 0,
       "minimum_pce_svn": 0,
       "minimum_tee_tcb_svn": "03010200000000000000000000000000",
-      "accepted_mr_seams": [
-        "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c"
-      ],
       "td_attributes": "0000001000000000",
       "xfam": "e702060000000000",
       "mr_config_id_zero": true,
@@ -144,7 +137,8 @@
       "platform_measurements": [
         "extra_large_1d_b300_new",
         "extra_large_2d_b300_new"
-      ]
+      ],
+      "mr_seam": "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c"
     }
   }
 }
