@@ -24,10 +24,13 @@ will be archived when legacy client support ends.
   Intel TDX machines by their 16-byte PPID (32 hex chars)
 - `policies.json` — named validation policies. Each policy declares its
   `platform` (`sev-snp` or `tdx`) and the platform-specific verification
-  parameters (TCB floors, guest policy, accepted MR_SEAM values, allowed
-  platform measurements, ...)
+  parameters (TCB floors, guest policy, the expected MR_SEAM, allowed
+  platform measurements, ...). Every policy member is required — verifiers
+  parse fail-closed, rejecting unknown or absent members
 - `platforms/` — platform-specific boot configurations and metadata used to
-  compute TDX measurements
+  compute TDX measurements, plus each slug's `shape.json` (the VM shape the
+  measurement is valid for: `cpus`, `memory_mb`, `disks`, optional `gpus`),
+  merged into every published measurement entry
 - `scripts/` — tooling (run from the repository root):
   - `measure.sh` — generate measurements for all platforms
   - `fetch-tdx-measure.sh` / `fetch-ovmf.sh` — download build inputs
@@ -57,7 +60,7 @@ will be archived when legacy client support ends.
 - **Change a policy**: edit `policies.json`, open a PR. All machines
   referencing the policy move atomically with the release.
 - **Add a platform configuration**: add `platforms/<name>/` with
-  `metadata.json` and metadata blobs, then re-measure.
+  `metadata.json`, metadata blobs, and `shape.json`, then re-measure.
 
 ## Usage
 
