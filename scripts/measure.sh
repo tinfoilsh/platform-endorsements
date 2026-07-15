@@ -11,11 +11,17 @@ for dir in platforms/*; do
     ./tdx-measure $dir/metadata.json --platform-only --json-file measurements/${name}.json
 done
 
-# Combine all measurement files into one JSON, with platform names as keys
+# Combine all measurement files into one JSON, with platform names as keys,
+# merging in the slug's reviewed shape descriptor. shape is required on
+# every measurement (v3 parsers reject entries without it).
 for file in measurements/*.json; do
     name=$(basename $file | cut -d. -f1)
-    # Create a JSON with the platform name as the key
-    jq --arg name "$name" '. as $data | {($name): $data}' "$file" > "$file.tmp"
+    if [ ! -f "platforms/${name}/shape.json" ]; then
+        echo "platforms/${name}/shape.json missing" >&2
+        exit 1
+    fi
+    jq --arg name "$name" --slurpfile shape "platforms/${name}/shape.json" \
+        '{($name): (. + {shape: $shape[0]})}' "$file" > "$file.tmp"
     mv "$file.tmp" "$file"
 done
 

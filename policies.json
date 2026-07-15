@@ -4,6 +4,7 @@
     "sev_snp": {
       "minimum_build": 21,
       "minimum_api_version": "1.55",
+      "minimum_abi_version": "0.0",
       "minimum_guest_svn": 0,
       "minimum_tcb": {
         "bl_spl": 7,
@@ -26,12 +27,18 @@
       "platform_info": {
         "smt_enabled": true,
         "tsme_enabled": true,
-        "ecc_enabled": false,
+        "ecc_enabled": true,
         "rapl_disabled": false,
-        "ciphertext_hiding_dram": false
+        "ciphertext_hiding_dram": false,
+        "alias_check_complete": true
       },
       "permit_provisional_firmware": false,
-      "vmpl": null
+      "vmpl": 0,
+      "host_data": "0000000000000000000000000000000000000000000000000000000000000000",
+      "image_id": "00000000000000000000000000000000",
+      "family_id": "00000000000000000000000000000000",
+      "minimum_launch_mitigation_vector": 0,
+      "minimum_current_mitigation_vector": 0
     }
   },
   "amd-turin-prod": {
@@ -39,6 +46,7 @@
     "sev_snp": {
       "minimum_build": 0,
       "minimum_api_version": "1.58",
+      "minimum_abi_version": "0.0",
       "minimum_guest_svn": 0,
       "minimum_tcb": {
         "fmc_spl": 1,
@@ -68,24 +76,22 @@
         "ciphertext_hiding_dram": false
       },
       "permit_provisional_firmware": false,
-      "vmpl": null
+      "vmpl": 0,
+      "host_data": "0000000000000000000000000000000000000000000000000000000000000000",
+      "image_id": "00000000000000000000000000000000",
+      "family_id": "00000000000000000000000000000000",
+      "minimum_launch_mitigation_vector": 0,
+      "minimum_current_mitigation_vector": 0
     }
   },
   "tdx-h200-prod": {
     "platform": "tdx",
     "tdx": {
       "qe_vendor_id": "939a7233f79c4ca9940a0db3957f0607",
-      "minimum_qe_svn": 0,
-      "minimum_pce_svn": 0,
       "minimum_tee_tcb_svn": "03010200000000000000000000000000",
-      "accepted_mr_seams": [
-        "7bf063280e94fb051f5dd7b1fc59ce9aac42bb961df8d44b709c9b0ff87a7b4df648657ba6d1189589feab1d5a3c9a9d"
-      ],
+      "mr_seam": "7bf063280e94fb051f5dd7b1fc59ce9aac42bb961df8d44b709c9b0ff87a7b4df648657ba6d1189589feab1d5a3c9a9d",
       "td_attributes": "0000001000000000",
       "xfam": "e702060000000000",
-      "mr_config_id_zero": true,
-      "mr_owner_zero": true,
-      "mr_owner_config_zero": true,
       "minimum_tcb_evaluation_data_number": 19,
       "platform_measurements": [
         "mini_0d",
@@ -107,17 +113,10 @@
     "platform": "tdx",
     "tdx": {
       "qe_vendor_id": "939a7233f79c4ca9940a0db3957f0607",
-      "minimum_qe_svn": 0,
-      "minimum_pce_svn": 0,
       "minimum_tee_tcb_svn": "03010200000000000000000000000000",
-      "accepted_mr_seams": [
-        "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c"
-      ],
+      "mr_seam": "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c",
       "td_attributes": "0000001000000000",
       "xfam": "e702060000000000",
-      "mr_config_id_zero": true,
-      "mr_owner_zero": true,
-      "mr_owner_config_zero": true,
       "minimum_tcb_evaluation_data_number": 19,
       "platform_measurements": [
         "extra_large_1d_b200_new",
@@ -129,17 +128,10 @@
     "platform": "tdx",
     "tdx": {
       "qe_vendor_id": "939a7233f79c4ca9940a0db3957f0607",
-      "minimum_qe_svn": 0,
-      "minimum_pce_svn": 0,
       "minimum_tee_tcb_svn": "03010200000000000000000000000000",
-      "accepted_mr_seams": [
-        "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c"
-      ],
+      "mr_seam": "476a2997c62bccc78370913d0a80b956e3721b24272bc66c4d6307ced4be2865c40e26afac75f12df3425b03eb59ea7c",
       "td_attributes": "0000001000000000",
       "xfam": "e702060000000000",
-      "mr_config_id_zero": true,
-      "mr_owner_zero": true,
-      "mr_owner_config_zero": true,
       "minimum_tcb_evaluation_data_number": 19,
       "platform_measurements": [
         "extra_large_1d_b300_new",
