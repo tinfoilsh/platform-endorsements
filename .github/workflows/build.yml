@@ -68,6 +68,17 @@ jobs:
           platform-endorsements.json
           tinfoil.hash
 
+    - name: Report release for freshness witnessing
+      run: |
+        oidc_token=$(curl -fsSL \
+          -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+          "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tinfoilsh%2Ffreshness-witness" | jq -er '.value')
+        payload=$(jq -nc --arg token "$oidc_token" '{oidc_token: $token}')
+        curl -fsS --retry 5 --retry-all-errors \
+          -H "Content-Type: application/json" \
+          -d "$payload" \
+          https://api.tinfoil.sh/api/webhooks/freshness-report
+
     # Ask the legacy hardware-measurements repo to republish its v1 artifact
     # (the .measurements section of this release) under its own signing
     # identity, so legacy verifiers stay in sync during their support window.
