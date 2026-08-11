@@ -1,9 +1,9 @@
 tdx-measure
-measurements/
 hardware-measurements.json
 platform-endorsements.json
 tinfoil.hash
-transcripts/
 OVMF.fd
 __pycache__
-.cursor
+.measure-*/
+*.download
+.cursor/

@@ -94,12 +94,8 @@
       "xfam": "e702060000000000",
       "minimum_tcb_evaluation_data_number": 19,
       "platform_measurements": [
-        "mini_0d",
-        "small_0d",
         "small_0d_new",
-        "medium_0d",
         "medium_0d_new",
-        "medium_1d",
         "medium_1d_new",
         "medium_2d_new",
         "medium_4d_new",

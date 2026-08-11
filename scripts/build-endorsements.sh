@@ -1,6 +1,6 @@
 #!/bin/bash
 # Assemble platform-endorsements.json from the measured platform data
-# (hardware-measurements.json, produced by scripts/measure.sh) plus the
+# (hardware-measurements.json, produced by measure.py) plus the
 # reviewed machines.json and policies.json inputs.
 # Run from the repository root: ./scripts/build-endorsements.sh
 set -e
