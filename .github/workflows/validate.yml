@@ -15,5 +15,12 @@ jobs:
     steps:
     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
 
-    - name: Validate machines and policies
-      run: python3 scripts/validate.py
+    - name: Validate endorsement inputs
+      run: |
+        python3 scripts/validate.py
+        python3 -m unittest scripts.validate_test
+
+    - name: Rebuild platform endorsements
+      run: |
+        ./measure.py
+        ./scripts/build-endorsements.sh

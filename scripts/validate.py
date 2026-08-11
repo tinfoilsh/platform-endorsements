@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CI validation for the platform-endorsements inputs (machines.json + policies.json).
+"""CI validation for the platform-endorsements inputs.
 
 Rules:
   1. every machines.json value names an existing, schema-valid policy
@@ -7,9 +7,10 @@ Rules:
      (128 lowercase hex chars for sev-snp, 32 for tdx)
   3. no duplicate identifiers (detected at JSON text level)
   4. machines.json carries identifiers and policy names only
-  5. every platform_measurements reference resolves to a platforms/ slug
-     with a shape.json
-  6. all hex lowercase
+  5. every platform_measurements reference resolves to a configured platform
+  6. platform generation inputs match their reviewed shapes
+  7. all platform inputs use the supported QEMU source
+  8. all hex lowercase
 
 Policy blocks follow PLATFORM_ENDORSEMENTS.md §2/§3: every member is
 required, unknown members are errors (fail-closed, mirroring the SDK
@@ -23,6 +24,7 @@ from pathlib import Path
 
 HEX_RE = re.compile(r"^[0-9a-f]+$")
 VERSION_RE = re.compile(r"^\d+\.\d+$")
+MEMORY_RE = re.compile(r"^(\d+)M$")
 
 SEV_ID_LEN = 128
 PPID_LEN = 32
@@ -53,6 +55,14 @@ TDX_FIELDS = {
 }
 SHAPE_FIELDS = {"cpus", "memory_mb", "disks"}
 SHAPE_OPTIONAL_FIELDS = {"gpus"}
+PLATFORM_FIELDS = {
+    "cpus", "disks", "memory", "pci_hole64_size", "profile", "qemu_source",
+}
+PLATFORM_OPTIONAL_FIELDS = {
+    "acpi_memory", "cpu", "pci_hole64_end", "pci_hole64_start",
+}
+PLATFORM_PROFILES = {"none", "single", "hopper", "blackwell"}
+QEMU_SOURCE = "qemu:10.1.0"
 
 errors: list[str] = []
 
@@ -138,7 +148,12 @@ def validate_sev_policy(name: str, block: dict) -> None:
     check_hex(f"{ctx}: family_id", block.get("family_id"), 32)
 
 
-def validate_tdx_policy(name: str, block: dict, shaped_slugs: set[str]) -> None:
+def validate_tdx_policy(
+    name: str,
+    block: dict,
+    shaped_slugs: set[str],
+    referenced_slugs: set[str],
+) -> None:
     ctx = f"policy {name}"
     check_members(f"{ctx}: tdx", block, TDX_FIELDS)
     check_hex(f"{ctx}: qe_vendor_id", block.get("qe_vendor_id"), 32)
@@ -153,35 +168,81 @@ def validate_tdx_policy(name: str, block: dict, shaped_slugs: set[str]) -> None:
         err(f"{ctx}: platform_measurements must be a non-empty array")
         return
     for ref in refs:
+        if isinstance(ref, str):
+            referenced_slugs.add(ref)
         if ref not in shaped_slugs:
             err(f"{ctx}: platform_measurements ref {ref!r} has no platforms/<slug>/shape.json")
 
 
-def validate_shape(slug: str, path: Path) -> bool:
+def validate_shape(slug: str, path: Path):
     shape = load(path)
     if shape is None:
-        return False
+        return None
+    if not isinstance(shape, dict):
+        err(f"platform {slug}: shape.json must be an object")
+        return None
     check_members(f"platform {slug}: shape.json", shape, SHAPE_FIELDS, SHAPE_OPTIONAL_FIELDS)
     for k, v in shape.items():
         check_uint(f"platform {slug}: shape.json {k}", v)
-    return True
+    return shape
+
+
+def validate_platform(slug: str, config, shape) -> None:
+    ctx = f"platform {slug}: platform.json"
+    if not isinstance(config, dict):
+        err(f"{ctx}: must be an object")
+        return
+    check_members(ctx, config, PLATFORM_FIELDS, PLATFORM_OPTIONAL_FIELDS)
+    for field in ("cpus", "disks"):
+        check_uint(f"{ctx} {field}", config.get(field))
+    for field in ("memory", "acpi_memory"):
+        if field in config and not MEMORY_RE.match(str(config[field])):
+            err(f"{ctx} {field}: must be expressed as integer MiB, got {config[field]!r}")
+    if config.get("profile") not in PLATFORM_PROFILES:
+        err(f"{ctx} profile: unsupported value {config.get('profile')!r}")
+    if config.get("qemu_source") != QEMU_SOURCE:
+        err(f"{ctx} qemu_source: must be {QEMU_SOURCE!r}")
+    if shape is None:
+        return
+    memory = MEMORY_RE.match(str(config.get("memory", "")))
+    expected = {
+        "cpus": config.get("cpus"),
+        "disks": config.get("disks"),
+        "memory_mb": int(memory.group(1)) if memory else None,
+    }
+    for field, value in expected.items():
+        if shape.get(field) != value:
+            err(f"platform {slug}: shape.json {field}={shape.get(field)!r} "
+                f"does not match platform.json {value!r}")
 
 
 def main() -> int:
     root = Path(__file__).parent.parent
     machines = load(root / "machines.json")
     policies = load(root / "policies.json")
+    platforms = load(root / "platform.json")
     platform_slugs = {p.name for p in (root / "platforms").iterdir() if p.is_dir()}
 
-    shaped_slugs = {
-        slug for slug in sorted(platform_slugs)
-        if validate_shape(slug, root / "platforms" / slug / "shape.json")
+    shapes = {
+        slug: validate_shape(slug, root / "platforms" / slug / "shape.json")
+        for slug in sorted(platform_slugs)
     }
+    shaped_slugs = {slug for slug, shape in shapes.items() if shape is not None}
 
-    if machines is None or policies is None:
+    configured_slugs = set(platforms) if isinstance(platforms, dict) else set()
+    if configured_slugs != platform_slugs:
+        err(f"platform.json keys and platforms/ directories differ: "
+            f"only_config={sorted(configured_slugs - platform_slugs)}, "
+            f"only_directories={sorted(platform_slugs - configured_slugs)}")
+    if isinstance(platforms, dict):
+        for slug, config in platforms.items():
+            validate_platform(slug, config, shapes.get(slug))
+
+    if machines is None or policies is None or platforms is None:
         print("\n".join(errors), file=sys.stderr)
         return 1
 
+    referenced_slugs: set[str] = set()
     for name, policy in policies.items():
         platform = policy.get("platform")
         if platform not in ("sev-snp", "tdx"):
@@ -194,7 +255,12 @@ def main() -> int:
         if platform == "sev-snp":
             validate_sev_policy(name, policy[block_key])
         else:
-            validate_tdx_policy(name, policy[block_key], shaped_slugs)
+            validate_tdx_policy(name, policy[block_key], shaped_slugs, referenced_slugs)
+
+    unreferenced = configured_slugs - referenced_slugs
+    if unreferenced:
+        err(f"platform.json contains platforms not referenced by any TDX policy: "
+            f"{sorted(unreferenced)}")
 
     for identifier, policy_name in machines.items():
         if not isinstance(policy_name, str):

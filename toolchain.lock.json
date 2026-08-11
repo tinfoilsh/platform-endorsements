@@ -1,0 +1,13 @@
+{
+  "tdx_measure": {
+    "source_commit": "f083e5c4b3de5a1c447d04f26762c24686fe9ca4",
+    "url": "https://github.com/tinfoilsh/tdx-measure-tinfoil/releases/download/v0.1.2-tinfoil.1/tdx-measure",
+    "version": "v0.1.2-tinfoil.1",
+    "sha256": "0b104e31e66179f4a96266eca7b425572f491611e9f42a72a8a1eb8244d29dd9"
+  },
+  "ovmf": {
+    "package_url": "https://archive.ubuntu.com/ubuntu/pool/main/e/edk2/ovmf_2025.02-3ubuntu2_all.deb",
+    "package_path": "usr/share/ovmf/OVMF.fd",
+    "sha256": "9e807cb2cd4313406a3aa4becc0836671a5c64ca7bdc08a45e15260184b446bf"
+  }
+}

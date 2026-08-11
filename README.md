@@ -27,18 +27,19 @@ will be archived when legacy client support ends.
   parameters (TCB floors, guest policy, the expected MR_SEAM, allowed
   platform measurements, ...). Every policy member is required — verifiers
   parse fail-closed, rejecting unknown or absent members
-- `platforms/` — platform-specific boot configurations and metadata used to
-  compute TDX measurements, plus each slug's `shape.json` (the VM shape the
-  measurement is valid for: `cpus`, `memory_mb`, `disks`, optional `gpus`),
-  merged into every published measurement entry
+- `platform.json` — reviewed CPU, memory, disk, QEMU, and PCI topology inputs
+  used to reconstruct every supported platform offline
+- `toolchain.lock.json` — pinned `tdx-measure` and OVMF inputs, including
+  download URLs and SHA-256 digests
+- `boot/` — shared OVMF boot variables
+- `platforms/` — each slug's reviewed `shape.json` (`cpus`, `memory_mb`,
+  `disks`, optional `gpus`), merged into every published measurement entry
+- `measure.py` — fetches the pinned toolchain, reconstructs ACPI tables, and
+  generates `hardware-measurements.json`
 - `scripts/` — tooling (run from the repository root):
-  - `measure.sh` — generate measurements for all platforms
-  - `fetch-tdx-measure.sh` / `fetch-ovmf.sh` — download build inputs
-  - `validate.py` — validate `machines.json` + `policies.json` (runs in CI
-    on every PR and release)
+  - `validate.py` — validate machines, policies, platform inputs, and shapes
+    (runs in CI on every PR and release)
   - `build-endorsements.sh` — assemble `platform-endorsements.json`
-  - `transcripts.sh` — human-readable transcripts of platform metadata
-  - `analyze.py` — compare metadata files across platform configs
 
 ## Data provenance
 
@@ -49,6 +50,9 @@ will be archived when legacy client support ends.
   maps to exactly one policy by construction.
 - `policies.json` is hand-authored and review-gated: its values define what
   Tinfoil clients enforce when verifying attestation from these machines.
+- TDX ACPI tables are reconstructed during every build from the reviewed
+  `platform.json` inputs. They are not copied from a running CVM or stored in
+  the repository. All supported platforms use QEMU 10.1.0.
 
 ## Updating
 
@@ -59,35 +63,41 @@ will be archived when legacy client support ends.
   lease returned, CPU replaced) MUST be removed from `machines.json`.
 - **Change a policy**: edit `policies.json`, open a PR. All machines
   referencing the policy move atomically with the release.
-- **Add a platform configuration**: add `platforms/<name>/` with
-  `metadata.json`, metadata blobs, and `shape.json`, then re-measure.
+- **Add a platform configuration**: add its production inputs to
+  `platform.json`, add `platforms/<name>/shape.json`, reference the slug from
+  a TDX policy, then regenerate the endorsements artifact. CI requires the
+  configured CPU, memory, and disk values to match the reviewed shape.
 
 ## Usage
 
-1. Fetch required tools:
-   ```bash
-   ./scripts/fetch-tdx-measure.sh
-   ./scripts/fetch-ovmf.sh
-   ```
+Generate measurements and the endorsements artifact:
 
-2. Generate measurements and the endorsements artifact:
    ```bash
-   ./scripts/measure.sh
+   ./measure.py
    ./scripts/build-endorsements.sh
    ```
 
-## Platforms
+Pass one or more platform slugs to `measure.py` to generate a subset, or use
+`--output` to select another output path.
 
-Each platform directory contains:
-- `metadata.json` - Configuration file with hardware specifications
-- `metadata/` - Binary files with platform-specific data
+## Measurement generation
+
+`measure.py` downloads and verifies the pinned `tdx-measure` and OVMF inputs,
+translates each `platform.json` entry into the ordered QEMU 10.1.0 device
+topology used in production, reconstructs the ACPI tables in a temporary
+directory, and computes the final TDX measurements. Generated tables and
+intermediate metadata are intentionally not committed.
+
+Device stand-ins reproduce the measured PCI topology without requiring real
+hardware: `pci-testdev` occupies host-specific endpoints, sparse memory backs
+large guest shapes, and GPU root ports preserve the reviewed PCI aperture.
 
 ## GitHub Actions
 
 On each tag push, the release workflow:
 1. Validates `machines.json` and `policies.json`
-2. Downloads the required tools (`tdx-measure` and `OVMF`)
-3. Generates hardware measurements for all platforms and assembles
+2. Downloads and checksum-verifies the pinned toolchain
+3. Reconstructs ACPI, generates measurements, and assembles
    `platform-endorsements.json`
 4. Creates a Sigstore attestation for the artifact (predicate
    `https://tinfoil.sh/predicate/platform-endorsements/v1`)

@@ -38,11 +38,7 @@ jobs:
     - name: Validate machines and policies
       run: python3 scripts/validate.py
 
-    - run: ./scripts/fetch-tdx-measure.sh
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: ./scripts/fetch-ovmf.sh
-    - run: ./scripts/measure.sh
+    - run: ./measure.py
     - run: ./scripts/build-endorsements.sh
 
     - name: Hash platform endorsements
