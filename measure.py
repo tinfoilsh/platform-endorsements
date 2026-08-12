@@ -76,12 +76,18 @@ def ensure_ovmf():
 
 
 def qemu_shape(memory, platform):
+    drives = [
+        f"file=/dev/null,if=none,id=disk{index},format=raw,readonly=on"
+        for index in range(platform["disks"])
+    ]
     devices = [
-        "e1000,netdev=net0,bus=pcie.0,addr=0x2,romfile=",
-        "pci-testdev",
+        "virtio-serial-pci,bus=pcie.0,addr=0x1,disable-legacy=on,iommu_platform=true,romfile=",
+        "virtio-net-pci,netdev=net0,bus=pcie.0,addr=0x2,disable-legacy=on,"
+        "iommu_platform=true,romfile=",
     ]
     devices.extend(
-        f"virtio-scsi-pci,id=scsi{index},disable-legacy=on,iommu_platform=true"
+        f"virtio-blk-pci,drive=disk{index},id=blk{index},bus=pcie.0,addr=0x{index + 4:x},"
+        "disable-legacy=on,iommu_platform=true,romfile="
         for index in range(platform["disks"])
     )
 
@@ -90,6 +96,7 @@ def qemu_shape(memory, platform):
     if profile == "single":
         devices.append("pcie-root-port,id=pci.1,bus=pcie.0,slot=1,pref64-reserve=512G")
         devices.append("pci-testdev,bus=pci.1,addr=0x0")
+        fw_cfg.append("name=opt/ovmf/X-PciMmio64Mb,string=262144")
     elif profile in ("blackwell", "hopper"):
         root_ports = 8 if profile == "blackwell" else 12
         for index in range(root_ports):
@@ -122,6 +129,7 @@ def qemu_shape(memory, platform):
         ],
         "objects": [f"memory-backend-memfd,id=mem0,size={memory},share=on"],
         "netdevs": ["hubport,id=net0,hubid=0"],
+        "drives": drives,
         "devices": devices,
         "fw_cfg": fw_cfg,
     }
