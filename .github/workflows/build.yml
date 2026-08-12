@@ -69,7 +69,10 @@ jobs:
         oidc_token=$(curl -fsSL \
           -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
           "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tinfoilsh%2Ffreshness-witness" | jq -er '.value')
-        payload=$(jq -nc --arg token "$oidc_token" '{oidc_token: $token}')
+        payload=$(jq -nc \
+          --arg token "$oidc_token" \
+          --arg tag "$GITHUB_REF_NAME" \
+          '{oidc_token: $token, tag: $tag}')
         curl -fsS --retry 5 --retry-all-errors \
           -H "Content-Type: application/json" \
           -d "$payload" \
