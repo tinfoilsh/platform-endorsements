@@ -94,9 +94,13 @@
       "xfam": "e702060000000000",
       "minimum_tcb_evaluation_data_number": 19,
       "platform_measurements": [
+        "tiny_0d_new",
         "small_0d_new",
+        "small_0d_32gb_new",
         "medium_0d_new",
         "medium_1d_new",
+        "medium_1d_4cpu_new",
+        "medium_1d_cpu_new",
         "medium_2d_new",
         "medium_4d_new",
         "large_1d_new",
