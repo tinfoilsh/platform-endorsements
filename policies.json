@@ -116,6 +116,7 @@
       "minimum_tcb_evaluation_data_number": 19,
       "platform_measurements": [
         "medium_1d_new",
+        "medium_2d_new",
         "extra_large_1d_b200_new",
         "extra_large_2d_b200_new"
       ]
@@ -132,6 +133,7 @@
       "minimum_tcb_evaluation_data_number": 19,
       "platform_measurements": [
         "medium_1d_new",
+        "medium_2d_new",
         "extra_large_1d_b200_new",
         "extra_large_2d_b200_new"
       ]
