@@ -89,9 +89,9 @@ directory, and computes the final TDX measurements. Generated tables and
 intermediate metadata are intentionally not committed.
 
 Device stand-ins reproduce the measured PCI topology without requiring real
-hardware: backend-free virtio devices occupy the fixed v0.11 guest slots,
-`pci-testdev` occupies GPU endpoints, sparse memory backs large guest shapes,
-and GPU root ports preserve the reviewed PCI aperture.
+hardware: read-only null-backed virtio-blk devices occupy the fixed v0.11 disk
+slots, `pci-testdev` occupies GPU endpoints, sparse memory backs large guest
+shapes, and GPU root ports preserve the reviewed PCI aperture.
 
 ## GitHub Actions
 

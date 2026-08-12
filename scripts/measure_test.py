@@ -24,10 +24,19 @@ class QemuShapeTest(unittest.TestCase):
             [
                 "virtio-serial-pci,bus=pcie.0,addr=0x1,disable-legacy=on,iommu_platform=true,romfile=",
                 "virtio-net-pci,netdev=net0,bus=pcie.0,addr=0x2,disable-legacy=on,iommu_platform=true,romfile=",
-                "virtio-scsi-pci,id=scsi0,bus=pcie.0,addr=0x4,disable-legacy=on,iommu_platform=true,romfile=",
-                "virtio-scsi-pci,id=scsi1,bus=pcie.0,addr=0x5,disable-legacy=on,iommu_platform=true,romfile=",
-                "virtio-scsi-pci,id=scsi2,bus=pcie.0,addr=0x6,disable-legacy=on,iommu_platform=true,romfile=",
-                "virtio-scsi-pci,id=scsi3,bus=pcie.0,addr=0x7,disable-legacy=on,iommu_platform=true,romfile=",
+                "virtio-blk-pci,drive=disk0,id=blk0,bus=pcie.0,addr=0x4,disable-legacy=on,iommu_platform=true,romfile=",
+                "virtio-blk-pci,drive=disk1,id=blk1,bus=pcie.0,addr=0x5,disable-legacy=on,iommu_platform=true,romfile=",
+                "virtio-blk-pci,drive=disk2,id=blk2,bus=pcie.0,addr=0x6,disable-legacy=on,iommu_platform=true,romfile=",
+                "virtio-blk-pci,drive=disk3,id=blk3,bus=pcie.0,addr=0x7,disable-legacy=on,iommu_platform=true,romfile=",
+            ],
+        )
+        self.assertEqual(
+            shape["drives"],
+            [
+                "file=/dev/null,if=none,id=disk0,format=raw,readonly=on",
+                "file=/dev/null,if=none,id=disk1,format=raw,readonly=on",
+                "file=/dev/null,if=none,id=disk2,format=raw,readonly=on",
+                "file=/dev/null,if=none,id=disk3,format=raw,readonly=on",
             ],
         )
         self.assertIn(
