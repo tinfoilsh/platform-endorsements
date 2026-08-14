@@ -109,6 +109,31 @@
       ]
     }
   },
+  "tdx-h200-1-5-24-prod": {
+    "platform": "tdx",
+    "tdx": {
+      "qe_vendor_id": "939a7233f79c4ca9940a0db3957f0607",
+      "minimum_tee_tcb_svn": "03010200000000000000000000000000",
+      "mr_seam": "489e585f1c54bc5a02066c8c6ec21619ff0334ec6f21e07e2a35202c59183789c8057e7d97dd591bb08314b185819e72",
+      "td_attributes": "0000001000000000",
+      "xfam": "e702060000000000",
+      "minimum_tcb_evaluation_data_number": 19,
+      "platform_measurements": [
+        "tiny_0d_new",
+        "small_0d_new",
+        "small_0d_32gb_new",
+        "medium_0d_new",
+        "medium_1d_new",
+        "medium_1d_4cpu_new",
+        "medium_1d_cpu_new",
+        "medium_2d_new",
+        "medium_4d_new",
+        "large_1d_new",
+        "extra_large_1d_new",
+        "extra_large_2d_new"
+      ]
+    }
+  },
   "tdx-b200-prod": {
     "platform": "tdx",
     "tdx": {
