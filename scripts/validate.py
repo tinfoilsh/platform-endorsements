@@ -48,7 +48,9 @@ PLATFORM_INFO_FIELDS = {
     "smt_enabled", "tsme_enabled", "ecc_enabled", "rapl_disabled",
     "ciphertext_hiding_dram",
 }
-PLATFORM_INFO_OPTIONAL_FIELDS = {"alias_check_complete", "tio_enabled"}
+PLATFORM_INFO_OPTIONAL_FIELDS = {
+    "alias_check_complete", "iommu_write_safe", "tio_enabled",
+}
 TDX_FIELDS = {
     "qe_vendor_id", "minimum_tee_tcb_svn", "mr_seam", "td_attributes",
     "xfam", "minimum_tcb_evaluation_data_number", "platform_measurements",

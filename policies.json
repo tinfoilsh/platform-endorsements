@@ -74,7 +74,8 @@
         "ecc_enabled": true,
         "rapl_disabled": false,
         "ciphertext_hiding_dram": false,
-        "alias_check_complete": true
+        "alias_check_complete": true,
+        "iommu_write_safe": true
       },
       "permit_provisional_firmware": false,
       "vmpl": 0,
