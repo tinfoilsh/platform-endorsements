@@ -13,8 +13,8 @@
     "cpus": 32,
     "disks": 4,
     "memory": "524288M",
-    "pci_hole64_end": "0x3f8006014000",
-    "pci_hole64_size": "0x78006014000",
+    "pci_hole64_end": "0x3f8006018000",
+    "pci_hole64_size": "0x78006018000",
     "profile": "blackwell",
     "qemu_source": "qemu:10.1.0"
   },
@@ -41,8 +41,8 @@
     "cpus": 32,
     "disks": 5,
     "memory": "524288M",
-    "pci_hole64_end": "0x3f8006018000",
-    "pci_hole64_size": "0x78006018000",
+    "pci_hole64_end": "0x3f800601c000",
+    "pci_hole64_size": "0x7800601c000",
     "profile": "blackwell",
     "qemu_source": "qemu:10.1.0"
   },
