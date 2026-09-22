@@ -146,6 +146,33 @@
     "profile": "none",
     "qemu_source": "qemu:10.1.0"
   },
+  "small_0d_8gb_2cpu_4disk_new": {
+    "acpi_memory": "8192M",
+    "cpus": 2,
+    "disks": 4,
+    "memory": "8192M",
+    "pci_hole64_size": "4096G",
+    "profile": "none",
+    "qemu_source": "qemu:10.1.0"
+  },
+  "small_0d_8gb_4cpu_4disk_new": {
+    "acpi_memory": "8192M",
+    "cpus": 4,
+    "disks": 4,
+    "memory": "8192M",
+    "pci_hole64_size": "4096G",
+    "profile": "none",
+    "qemu_source": "qemu:10.1.0"
+  },
+  "small_0d_8gb_4cpu_5disk_new": {
+    "acpi_memory": "8192M",
+    "cpus": 4,
+    "disks": 5,
+    "memory": "8192M",
+    "pci_hole64_size": "4096G",
+    "profile": "none",
+    "qemu_source": "qemu:10.1.0"
+  },
   "tiny_0d_new": {
     "acpi_memory": "2048M",
     "cpus": 2,
