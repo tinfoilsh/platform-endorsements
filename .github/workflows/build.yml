@@ -46,6 +46,7 @@ jobs:
       id: hash
       run: |
         echo stdout=sha256:$(sudo sha256sum platform-endorsements.json | cut -d ' ' -f 1 | sudo tee tinfoil.hash) >> $GITHUB_OUTPUT
+        echo igvm_stdout=sha256:$(sha256sum platform-endorsements-igvm.json | cut -d ' ' -f 1 | tee tinfoil-igvm.hash) >> "$GITHUB_OUTPUT"
 
     - name: Attest platform endorsements
       uses: actions/attest@67422f5511b7ff725f4dbd6fb9bd2cd925c65a8d  # v1.4.1
@@ -56,6 +57,14 @@ jobs:
         predicate-type: https://tinfoil.sh/predicate/platform-endorsements/v1
         predicate-path: platform-endorsements.json
 
+    - name: Attest IGVM platform endorsements
+      uses: actions/attest@67422f5511b7ff725f4dbd6fb9bd2cd925c65a8d  # v1.4.1
+      with:
+        subject-name: platform-endorsements-igvm.json
+        subject-digest: ${{ steps.hash.outputs.igvm_stdout }}
+        predicate-type: https://tinfoil.sh/predicate/platform-endorsements/v1
+        predicate-path: platform-endorsements-igvm.json
+
     - name: Create release
       uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2.6.2
       with:
@@ -63,6 +72,8 @@ jobs:
         files: |
           platform-endorsements.json
           tinfoil.hash
+          platform-endorsements-igvm.json
+          tinfoil-igvm.hash
 
     # Ask the legacy hardware-measurements repo to republish its v1 artifact
     # (the .measurements section of this release) under its own signing

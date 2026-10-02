@@ -18,7 +18,8 @@ jobs:
     - name: Validate endorsement inputs
       run: |
         python3 scripts/validate.py
-        python3 -m unittest scripts.validate_test
+        python3 -m venv .venv
+        .venv/bin/python -m unittest scripts.validate_test scripts.build_endorsements_test
 
     - name: Rebuild platform endorsements
       run: |

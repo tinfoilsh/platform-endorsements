@@ -1,9 +1,12 @@
 tdx-measure
 hardware-measurements.json
 platform-endorsements.json
+platform-endorsements-igvm.json
 tinfoil.hash
+tinfoil-igvm.hash
 OVMF.fd
 __pycache__
+.venv/
 .measure-*/
 *.download
 .cursor/
