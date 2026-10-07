@@ -21,11 +21,15 @@ jq -n \
 echo "platform-endorsements.json assembled:"
 jq '{measurements: (.measurements | length), machines: (.machines | length), policies: (.policies | length)}' platform-endorsements.json
 
-jq '
+IGVM_MINIMUM_ABI_VERSION="1.51"
+jq --arg igvm_minimum_abi_version "$IGVM_MINIMUM_ABI_VERSION" '
   .measurements = {} |
   .policies |= with_entries(
     if .value.platform == "sev-snp" then
-      .value.sev_snp |= (del(.host_data) + {config_binding: "sha256"})
+      .value.sev_snp |= (
+        del(.host_data) + {config_binding: "sha256"} |
+        .minimum_abi_version = ([.minimum_abi_version, $igvm_minimum_abi_version] | max_by(split(".") | map(tonumber)))
+      )
     elif .value.platform == "tdx" then
       .value.tdx |= (del(.platform_measurements) + {config_binding: "sha256"})
     else error("unsupported IGVM platform")
