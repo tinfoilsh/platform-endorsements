@@ -9,16 +9,18 @@ class BuildEndorsementsTest(unittest.TestCase):
     def test_igvm_preserves_machine_security_policy_and_legacy_artifact(self):
         root = Path(__file__).resolve().parent.parent
         measurements = {"test-shape": {"mrtd": "a" * 96}}
+        policies = json.loads((root / "policies.json").read_text())
+        policies["amd-genoa-prod"]["sev_snp"]["minimum_abi_version"] = "2.0"
         with tempfile.TemporaryDirectory() as directory:
             work = Path(directory)
-            for name in ("scripts", "machines.json", "policies.json", "platform.json", "platforms"):
+            for name in ("scripts", "machines.json", "platform.json", "platforms"):
                 (work / name).symlink_to(root / name)
             (work / "hardware-measurements.json").write_text(json.dumps(measurements))
+            (work / "policies.json").write_text(json.dumps(policies))
             subprocess.run(["bash", str(root / "scripts/build-endorsements.sh")], cwd=work, check=True, capture_output=True)
             legacy = json.loads((work / "platform-endorsements.json").read_text())
             igvm = json.loads((work / "platform-endorsements-igvm.json").read_text())
 
-        policies = json.loads((root / "policies.json").read_text())
         machines = json.loads((root / "machines.json").read_text())
         self.assertEqual(legacy["measurements"], measurements)
         self.assertEqual(legacy["policies"], policies)
@@ -34,7 +36,10 @@ class BuildEndorsementsTest(unittest.TestCase):
             moved_field = "host_data" if block == "sev_snp" else "platform_measurements"
             self.assertEqual(policy[block].pop("config_binding"), "sha256")
             self.assertNotIn(moved_field, policy[block])
-            self.assertEqual(policy[block], {key: value for key, value in original[block].items() if key != moved_field})
+            expected = {key: value for key, value in original[block].items() if key != moved_field}
+            if block == "sev_snp":
+                expected["minimum_abi_version"] = "2.0" if name == "amd-genoa-prod" else "1.51"
+            self.assertEqual(policy[block], expected)
 
 
 if __name__ == "__main__":
