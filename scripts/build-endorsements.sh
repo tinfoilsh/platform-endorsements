@@ -20,21 +20,3 @@ jq -n \
 
 echo "platform-endorsements.json assembled:"
 jq '{measurements: (.measurements | length), machines: (.machines | length), policies: (.policies | length)}' platform-endorsements.json
-
-IGVM_MINIMUM_ABI_VERSION="1.51"
-RUNTIME_PLATFORM_FORMAT="https://tinfoil.sh/predicate/platform-endorsements/v2"
-jq --arg format "$RUNTIME_PLATFORM_FORMAT" --arg igvm_minimum_abi_version "$IGVM_MINIMUM_ABI_VERSION" '
-  .format = $format |
-  .measurements = {} |
-  .policies |= with_entries(
-    if .value.platform == "sev-snp" then
-      .value.sev_snp |= (
-        del(.host_data) |
-        .minimum_abi_version = ([.minimum_abi_version, $igvm_minimum_abi_version] | max_by(split(".") | map(tonumber)))
-      )
-    elif .value.platform == "tdx" then
-      .value.tdx |= del(.platform_measurements)
-    else error("unsupported IGVM platform")
-    end
-  )
-' platform-endorsements.json > platform-endorsements-igvm.json
