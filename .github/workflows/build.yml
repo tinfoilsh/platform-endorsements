@@ -62,7 +62,7 @@ jobs:
       with:
         subject-name: platform-endorsements-igvm.json
         subject-digest: ${{ steps.hash.outputs.igvm_stdout }}
-        predicate-type: https://tinfoil.sh/predicate/platform-endorsements/v1
+        predicate-type: https://tinfoil.sh/predicate/platform-endorsements/v2
         predicate-path: platform-endorsements-igvm.json
 
     - name: Create release

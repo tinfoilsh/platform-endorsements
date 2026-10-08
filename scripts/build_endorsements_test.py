@@ -27,14 +27,15 @@ class BuildEndorsementsTest(unittest.TestCase):
         self.assertEqual(legacy["machines"], machines)
         self.assertEqual(igvm["measurements"], {})
         self.assertEqual(igvm["machines"], machines)
-        self.assertEqual(igvm["format"], legacy["format"])
+        self.assertEqual(legacy["format"], "https://tinfoil.sh/predicate/platform-endorsements/v1")
+        self.assertEqual(igvm["format"], "https://tinfoil.sh/predicate/platform-endorsements/v2")
         self.assertEqual(set(igvm["policies"]), set(policies))
         for name, original in policies.items():
             policy = igvm["policies"][name]
             self.assertEqual(policy["platform"], original["platform"])
             block = "sev_snp" if policy["platform"] == "sev-snp" else "tdx"
             moved_field = "host_data" if block == "sev_snp" else "platform_measurements"
-            self.assertEqual(policy[block].pop("config_binding"), "sha256")
+            self.assertNotIn("config_binding", policy[block])
             self.assertNotIn(moved_field, policy[block])
             expected = {key: value for key, value in original[block].items() if key != moved_field}
             if block == "sev_snp":
